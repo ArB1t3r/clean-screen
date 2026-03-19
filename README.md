@@ -1,6 +1,6 @@
 # Clean Screen
 
-Raycast extension plus native macOS helper for screen cleaning mode.
+Raycast extension plus native macOS helper for temporarily locking the keyboard and showing a dark cleaning screen while you clean your display.
 
 When launched from Raycast, it:
 
@@ -9,6 +9,8 @@ When launched from Raycast, it:
 - blocks keyboard input while the session is active
 - keeps mouse input available so you can end the session by clicking
 - keeps an emergency fallback shortcut: `Control-U`
+
+It is designed to bring the functionality of existing standalone keyboard-cleaning tools into a Raycast workflow.
 
 ## Project Layout
 

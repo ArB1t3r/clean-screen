@@ -1,7 +1,7 @@
 {
   "name": "clean-screen",
   "title": "Clean Screen",
-  "description": "Turn your display into a dark cleaning screen and block keyboard input until you exit.",
+  "description": "Lock the keyboard and show a dark cleaning screen while you clean your display.",
   "author": "Eigenlicht",
   "license": "MIT",
   "icon": "icon.png",
@@ -15,7 +15,7 @@
     {
       "name": "index",
       "title": "Start Cleaning Session",
-      "description": "Show a black full-screen cleaning overlay and block keyboard input",
+      "description": "Lock the keyboard and start a dark full-screen cleaning mode",
       "mode": "no-view",
       "icon": "icon.png",
       "keywords": [
