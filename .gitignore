@@ -3,5 +3,4 @@ node_modules
 helper/.build
 assets/CleanScreenHelper
 dist
-package-lock.json
 helper.log
