@@ -4,8 +4,13 @@ import Carbon.HIToolbox
 import Foundation
 import SwiftUI
 
-let logURL = URL(fileURLWithPath: NSHomeDirectory())
-  .appendingPathComponent("Desktop/Projects/clean-screen/helper.log")
+let logURL: URL = {
+  let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
+    ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library")
+  let logsDirectory = libraryURL.appendingPathComponent("Logs", isDirectory: true)
+  try? FileManager.default.createDirectory(at: logsDirectory, withIntermediateDirectories: true)
+  return logsDirectory.appendingPathComponent("CleanScreenHelper.log")
+}()
 
 func log(_ message: String) {
   let line = "[\(ISO8601DateFormatter().string(from: Date()))] \(message)\n"
@@ -13,7 +18,7 @@ func log(_ message: String) {
 
   if FileManager.default.fileExists(atPath: logURL.path) {
     if let handle = try? FileHandle(forWritingTo: logURL) {
-      try? handle.seekToEnd()
+      _ = try? handle.seekToEnd()
       try? handle.write(contentsOf: data)
       try? handle.close()
     }
@@ -182,6 +187,7 @@ enum HelperError: LocalizedError {
 final class AppDelegate: NSObject, NSApplicationDelegate {
   static weak var shared: AppDelegate?
   private let session = SessionController.shared
+  private let maxWindowLookupAttempts = 20
   private lazy var blocker = KeyboardBlocker { [weak self] in
     self?.terminate()
   }
@@ -241,7 +247,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       if AXIsProcessTrusted() {
         timer.invalidate()
         log("Accessibility permission confirmed")
-        self.session.permissionPromptRequested = false
+        DispatchQueue.main.async {
+          self.session.permissionPromptRequested = false
+        }
       }
     }
   }
@@ -272,15 +280,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     session.permissionGranted = true
     session.permissionPromptRequested = false
     session.continueTemporarilyDisabled = false
-    configureWindowWhenReady()
-    scheduleFailsafeShutdown()
+    configureWindowWhenReady(attempt: 0)
   }
 
-  private func configureSetupWindowWhenReady() {
+  private func configureSetupWindowWhenReady(attempt: Int = 0) {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
       guard let window = NSApp.windows.first else {
-        self.configureSetupWindowWhenReady()
+        guard attempt < self.maxWindowLookupAttempts else {
+          log("Failed to find setup window after \(self.maxWindowLookupAttempts) attempts")
+          return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+          self.configureSetupWindowWhenReady(attempt: attempt + 1)
+        }
         return
       }
 
@@ -319,12 +333,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     log("Configured setup window")
   }
 
-  private func configureWindowWhenReady() {
+  private func configureWindowWhenReady(attempt: Int) {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
       guard let window = NSApp.windows.first else {
-        log("No SwiftUI window found yet")
-        self.configureWindowWhenReady()
+        guard attempt < self.maxWindowLookupAttempts else {
+          log("Failed to find fullscreen window after \(self.maxWindowLookupAttempts) attempts")
+          return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+          self.configureWindowWhenReady(attempt: attempt + 1)
+        }
         return
       }
 
@@ -361,15 +381,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
     NSApp.activate(ignoringOtherApps: true)
     log("Configured and presented SwiftUI window")
-  }
-
-  private func scheduleFailsafeShutdown() {
-    Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
-      log("Failsafe timer triggered")
-      Task { @MainActor in
-        self?.terminate()
-      }
-    }
   }
 
   private func presentFailureAndExit(message: String) {

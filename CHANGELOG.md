@@ -1,4 +1,4 @@
-## [Added] - {PR_MERGE_DATE}
+## [Initial Release] - {PR_MERGE_DATE}
 
 - Initial release of Clean Screen.
 - Adds a dark fullscreen cleaning mode for display cleaning.

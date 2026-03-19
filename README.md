@@ -29,7 +29,7 @@ It is designed to bring the functionality of existing standalone keyboard-cleani
 ## Build
 
 ```bash
-cd /Users/eigenlicht/Desktop/Projects/clean-screen
+cd clean-screen
 npm install
 npm run build:helper
 npm run dev
