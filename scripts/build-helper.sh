@@ -5,14 +5,15 @@ set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 HELPER_DIR="$ROOT_DIR/helper"
 ASSETS_DIR="$ROOT_DIR/assets"
-BUILD_OUTPUT="$HELPER_DIR/.build/release/CleanScreenHelper"
+SCRATCH_DIR="/tmp/clean-screen-helper-build"
+BUILD_OUTPUT="$SCRATCH_DIR/release/CleanScreenHelper"
 TARGET_OUTPUT="$ASSETS_DIR/CleanScreenHelper"
 APP_DIR="$ASSETS_DIR/CleanScreenHelper.app"
 MACOS_DIR="$APP_DIR/Contents/MacOS"
 RESOURCES_DIR="$APP_DIR/Contents/Resources"
 PLIST_PATH="$APP_DIR/Contents/Info.plist"
 
-swift build -c release --package-path "$HELPER_DIR"
+swift build -c release --package-path "$HELPER_DIR" --scratch-path "$SCRATCH_DIR"
 cp "$BUILD_OUTPUT" "$TARGET_OUTPUT"
 chmod +x "$TARGET_OUTPUT"
 
