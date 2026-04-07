@@ -31,8 +31,7 @@
     "dev": "npx ray develop",
     "build": "npx ray build",
     "lint": "npx ray lint",
-    "publish": "npx @raycast/api@latest publish",
-    "build:helper": "zsh ./scripts/build-helper.sh"
+    "publish": "npx @raycast/api@latest publish"
   },
   "dependencies": {
     "@raycast/api": "^1.103.0"

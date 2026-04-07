@@ -1,6 +1,8 @@
 node_modules
 .DS_Store
-helper/.build
-assets/CleanScreenHelper
 dist
 helper.log
+
+# Swift build artifacts
+assets/clean-screen-helper/.build
+assets/clean-screen-helper/.swiftpm

@@ -50,7 +50,6 @@ final class SessionController: ObservableObject {
 
 final class KeyboardBlocker {
   private var pendingControlKeyDown = false
-  private var pendingEscapeKeyDown = false
   private let onEmergencyExit: @MainActor () -> Void
 
   private var eventTap: CFMachPort?
@@ -135,10 +134,6 @@ final class KeyboardBlocker {
       return Unmanaged.passRetained(event)
     }
 
-    if keyCode(for: event) == Int64(kVK_Escape) {
-      pendingEscapeKeyDown = type == .keyDown
-    }
-
     if shouldAllow(event: event) {
       log("Allowed emergency shortcut keycode=\(keyCode(for: event)) flags=\(event.flags.rawValue)")
       pendingControlKeyDown = false
@@ -166,9 +161,7 @@ final class KeyboardBlocker {
       !flags.contains(.maskAlternate) &&
       keyCode == Int64(kVK_ANSI_U)
 
-    let allowsDoubleEscape = pendingEscapeKeyDown && keyCode == Int64(kVK_Escape)
-
-    return allowsEmergencyShortcut || allowsDoubleEscape
+    return allowsEmergencyShortcut
   }
 }
 
