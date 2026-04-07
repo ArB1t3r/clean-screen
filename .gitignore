@@ -6,3 +6,6 @@ helper.log
 # Swift build artifacts
 assets/clean-screen-helper/.build
 assets/clean-screen-helper/.swiftpm
+CleanScreenHelper.app
+AppIcon.icns
+AppIcon.iconset
